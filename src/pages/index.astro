@@ -1,0 +1,335 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import WritingCard from '@/components/WritingCard.astro';
+import { getCollection } from 'astro:content';
+
+const writingEntries = await getCollection('writing', ({ data }) => !data.draft);
+const artEntries = await getCollection('art', ({ data }) => !data.draft);
+const archEntries = await getCollection('architecture', ({ data }) => !data.draft);
+
+const latestWriting = writingEntries.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)[0];
+
+const latestArt = artEntries.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)[0];
+
+const latestArch = archEntries.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)[0];
+---
+
+<BaseLayout title="Home">
+  <!-- ── SCRAPBOOK MODE ──────────────────────────────────── -->
+  <main class="scrap-only">
+    <div class="container">
+      <section class="home-collage" aria-label="Latest content">
+
+        <!-- About blurb card -->
+        <div class="card home-about-card" style={`--rot: ${(Math.random() * 4 - 2).toFixed(1)}deg`}>
+          <h1 class="home-greeting">Hi, I'm Gabrielle ✨</h1>
+          <p class="home-bio">
+            This is my little corner of the internet — a scrapbook where I collect my
+            writing, artwork, and architecture projects. Pull up a chair.
+          </p>
+          <a href="/about" class="home-about-link">More about me →</a>
+        </div>
+
+        <!-- SVG doodle arrow (writing → art) -->
+        <svg
+          class="doodle-arrow home-arrow-1"
+          width="80"
+          height="60"
+          viewBox="0 0 80 60"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 50 C20 20, 50 10, 70 15"
+            stroke="var(--accent-1)"
+            stroke-width="2.5"
+            stroke-dasharray="5 3"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <path
+            d="M65 8 L70 15 L62 17"
+            stroke="var(--accent-1)"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
+
+        <!-- Latest writing card -->
+        {latestWriting && (
+          <div class="home-section-group">
+            <p class="home-section-label text-accent-1">✏️ Latest Writing</p>
+            <WritingCard entry={latestWriting} />
+          </div>
+        )}
+
+        <!-- SVG doodle arrow (between cards) -->
+        <svg
+          class="doodle-arrow home-arrow-2"
+          width="70"
+          height="70"
+          viewBox="0 0 70 70"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 10 C30 30, 40 50, 60 60"
+            stroke="var(--accent-3)"
+            stroke-width="2.5"
+            stroke-dasharray="5 3"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <path
+            d="M52 65 L60 60 L58 52"
+            stroke="var(--accent-3)"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
+
+        <!-- Latest art card -->
+        {latestArt && (
+          <div class="home-section-group">
+            <p class="home-section-label text-accent-3">🎨 Latest Art</p>
+            <div
+              class="card art-card-home"
+              style={`--rot: ${(Math.random() * 6 - 3).toFixed(1)}deg`}
+              role="button"
+              tabindex="0"
+              aria-label={`View artwork: ${latestArt.data.title}`}
+              data-lightbox-src={latestArt.data.image}
+              data-lightbox-title={latestArt.data.title}
+              data-lightbox-note={latestArt.data.note ?? ''}
+            >
+              <img
+                src={latestArt.data.image}
+                alt={latestArt.data.title}
+                class="torn-img"
+                loading="eager"
+                decoding="async"
+              />
+              <p class="art-home-title">{latestArt.data.title}</p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <!-- Section links -->
+      <div class="home-links">
+        <a href="/writing" class="home-nav-link">All Writing →</a>
+        <a href="/art" class="home-nav-link">All Art →</a>
+      </div>
+    </div>
+
+    <!-- Lightbox for home art card -->
+    <div
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Artwork lightbox"
+      aria-hidden="true"
+    >
+      <div class="lightbox-inner" id="lightbox-inner">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close lightbox">&times;</button>
+        <img id="lightbox-img" src="" alt="" />
+        <div class="lightbox-caption">
+          <strong id="lightbox-title"></strong>
+          <p id="lightbox-note"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── ARCHITECTURE MODE ───────────────────────────────── -->
+  <main class="arch-only">
+    {latestArch ? (
+      <>
+        <div class="arch-hero">
+          <img
+            src={latestArch.data.heroImage}
+            alt={`Hero image for ${latestArch.data.title}`}
+            loading="eager"
+            decoding="async"
+          />
+          <div class="arch-hero-overlay">
+            <span class={`badge badge--${latestArch.data.typology}`}>{latestArch.data.typology} · {latestArch.data.year}</span>
+            <h1>{latestArch.data.title}</h1>
+            <p class="arch-hero-excerpt">{latestArch.data.excerpt}</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="arch-home-footer">
+            <a href={`/architecture/${latestArch.slug}`} class="arch-hero-link">View Project →</a>
+            <a href="/architecture" class="arch-hero-link">All Projects →</a>
+          </div>
+        </div>
+      </>
+    ) : (
+      <div class="container">
+        <p class="mt-4">No architecture projects yet.</p>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .home-greeting {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .home-bio {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    margin-bottom: 0.75rem;
+  }
+
+  .home-about-link {
+    font-weight: 700;
+    color: var(--accent-1);
+  }
+
+  .home-section-label {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .home-section-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .art-card-home {
+    cursor: pointer;
+    padding: 0.75rem;
+    max-width: 280px;
+  }
+
+  .art-card-home img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+
+  .art-home-title {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .home-arrow-1 {
+    left: 35%;
+    top: 2rem;
+  }
+
+  .home-arrow-2 {
+    left: 60%;
+    top: 3rem;
+  }
+
+  .home-links {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0 2rem;
+  }
+
+  .home-nav-link {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-3);
+    text-decoration: none;
+  }
+
+  .home-nav-link:hover {
+    color: var(--accent-1);
+  }
+
+  .arch-hero-excerpt {
+    color: #e0e0e0;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    max-width: 600px;
+  }
+
+  .arch-home-footer {
+    display: flex;
+    gap: 2rem;
+    padding: 1.5rem 0;
+  }
+
+  .arch-hero-link {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent-1);
+  }
+
+  .arch-hero-link:hover {
+    color: var(--accent-2);
+  }
+</style>
+
+<script>
+  // Lightbox for home page art card
+  function initHomeLightbox() {
+    const overlay = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const titleEl = document.getElementById('lightbox-title');
+    const noteEl = document.getElementById('lightbox-note');
+    const closeBtn = document.getElementById('lightbox-close');
+
+    if (!overlay || !img || !titleEl || !noteEl || !closeBtn) return;
+
+    function openLightbox(src: string, title: string, note: string) {
+      img!.src = src;
+      img!.alt = title;
+      titleEl!.textContent = title;
+      noteEl!.textContent = note;
+      overlay!.classList.add('open');
+      overlay!.setAttribute('aria-hidden', 'false');
+      closeBtn!.focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      overlay!.classList.remove('open');
+      overlay!.setAttribute('aria-hidden', 'true');
+      img!.src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-lightbox-src]').forEach((el) => {
+      const handleOpen = () => {
+        const src = el.getAttribute('data-lightbox-src') ?? '';
+        const title = el.getAttribute('data-lightbox-title') ?? '';
+        const note = el.getAttribute('data-lightbox-note') ?? '';
+        openLightbox(src, title, note);
+      };
+      el.addEventListener('click', handleOpen);
+      el.addEventListener('keydown', (e: Event) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Enter' || ke.key === ' ') { ke.preventDefault(); handleOpen(); }
+      });
+    });
+
+    overlay.addEventListener('click', (e: MouseEvent) => { if (e.target === overlay) closeLightbox(); });
+    closeBtn.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeLightbox();
+    });
+  }
+
+  initHomeLightbox();
+  document.addEventListener('astro:after-swap', initHomeLightbox);
+</script>

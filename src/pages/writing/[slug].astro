@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('writing', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'writing'>;
+}
+
+const { entry } = Astro.props;
+const { title, date, category, series, seriesOrder } = entry.data;
+const { Content } = await entry.render();
+
+const formattedDate = date.toLocaleDateString('en-ZA', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Series navigation
+let seriesPrev: CollectionEntry<'writing'> | null = null;
+let seriesNext: CollectionEntry<'writing'> | null = null;
+
+if (series && seriesOrder !== undefined) {
+  const allWriting = await getCollection('writing', ({ data }) => !data.draft && data.series === series);
+  const sorted = allWriting.sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+  const idx = sorted.findIndex((e) => e.slug === entry.slug);
+  if (idx > 0) seriesPrev = sorted[idx - 1] ?? null;
+  if (idx < sorted.length - 1) seriesNext = sorted[idx + 1] ?? null;
+}
+---
+
+<BaseLayout title={title} description={entry.data.excerpt}>
+  <main>
+    <div class="container post-wrapper" style="view-transition-name: page-flip;">
+      <a href="/writing" class="back-link" aria-label="Back to writing list">← Writing</a>
+
+      <article class="post-body">
+        <header class="post-header">
+          <span class={`badge badge--${category}`}>{category}</span>
+          {series && <span class="series-label">Series: {series}{seriesOrder !== undefined ? ` (Part ${seriesOrder})` : ''}</span>}
+          <h1 class="post-title">{title}</h1>
+          <time class="post-date" datetime={date.toISOString()}>{formattedDate}</time>
+        </header>
+
+        <div class="post-content">
+          <Content />
+        </div>
+      </article>
+
+      <!-- Series navigation strip -->
+      {(seriesPrev || seriesNext) && (
+        <nav class="series-nav" aria-label="Series navigation">
+          <div>
+            {seriesPrev && (
+              <a href={`/writing/${seriesPrev.slug}`} class="series-nav-link series-nav-prev">
+                ← {seriesPrev.data.title}
+              </a>
+            )}
+          </div>
+          <div>
+            {seriesNext && (
+              <a href={`/writing/${seriesNext.slug}`} class="series-nav-link series-nav-next">
+                {seriesNext.data.title} →
+              </a>
+            )}
+          </div>
+        </nav>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .post-wrapper {
+    max-width: 720px;
+  }
+
+  .post-header {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .post-title {
+    font-size: 2.4rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .post-date {
+    font-size: 0.9rem;
+    opacity: 0.55;
+  }
+
+  .series-label {
+    font-size: 0.85rem;
+    color: var(--accent-3);
+    font-style: italic;
+  }
+
+  .post-content {
+    font-size: 1.15rem;
+    line-height: 1.8;
+  }
+
+  .post-content p {
+    margin-bottom: 1.1em;
+  }
+
+  .post-content h2 {
+    margin-top: 1.8em;
+    margin-bottom: 0.4em;
+    font-size: 1.7rem;
+  }
+
+  .post-content h3 {
+    margin-top: 1.4em;
+    font-size: 1.4rem;
+  }
+
+  .post-content blockquote {
+    border-left: 3px solid var(--accent-1);
+    padding-left: 1rem;
+    margin: 1.5em 0;
+    opacity: 0.85;
+    font-style: italic;
+  }
+
+  .series-nav-link {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'art'>;
+}
+
+const { entry } = Astro.props;
+const { title, medium, image, note } = entry.data;
+const rot = (Math.random() * 6 - 3).toFixed(1);
+---
+
+<article
+  class="card art-card"
+  style={`--rot: ${rot}deg`}
+  role="button"
+  tabindex="0"
+  aria-label={`View artwork: ${title}`}
+  data-lightbox-src={image}
+  data-lightbox-title={title}
+  data-lightbox-note={note ?? ''}
+>
+  <div class="art-card-img-wrap">
+    <img
+      src={image}
+      alt={title}
+      class="torn-img"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="art-card-body">
+    <span class={`badge badge--${medium}`}>{medium.replace('-', ' ')}</span>
+    <h3 class="art-card-title">{title}</h3>
+    {note && <p class="art-card-note">{note}</p>}
+  </div>
+</article>
+
+<style>
+  .art-card {
+    cursor: pointer;
+    padding: 0.75rem;
+  }
+
+  .art-card-img-wrap {
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .art-card-img-wrap img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    transition: transform 300ms ease;
+  }
+
+  .art-card:hover .art-card-img-wrap img {
+    transform: scale(1.04);
+  }
+
+  .art-card-title {
+    font-size: 1.2rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+
+  .art-card-note {
+    font-size: 0.9rem;
+    opacity: 0.75;
+    margin: 0;
+  }
+</style>

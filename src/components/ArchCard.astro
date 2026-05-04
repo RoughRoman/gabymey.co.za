@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'architecture'>;
+}
+
+const { entry } = Astro.props;
+const { title, typology, year, heroImage, excerpt } = entry.data;
+---
+
+<article class="card arch-card">
+  <a href={`/architecture/${entry.slug}`} class="arch-card-link" aria-label={`View project: ${title}`}>
+    <div class="arch-card-img-wrap">
+      <img
+        src={heroImage}
+        alt={`Hero image for ${title}`}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div class="arch-card-body">
+      <div class="arch-card-meta">
+        <span class={`badge badge--${typology}`}>{typology}</span>
+        <span class="arch-card-year">{year}</span>
+      </div>
+      <h3 class="arch-card-title">{title}</h3>
+      <p class="arch-card-excerpt">{excerpt}</p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .arch-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .arch-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .arch-card-img-wrap img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    transition: transform 300ms ease;
+    display: block;
+  }
+
+  .arch-card-link:hover img {
+    transform: scale(1.03);
+  }
+
+  .arch-card-img-wrap {
+    overflow: hidden;
+  }
+
+  .arch-card-body {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  .arch-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .arch-card-year {
+    font-size: 0.85rem;
+    color: var(--accent-1);
+    font-weight: 700;
+  }
+
+  .arch-card-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+  }
+
+  .arch-card-excerpt {
+    font-size: 0.95rem;
+    opacity: 0.75;
+    margin: 0;
+  }
+</style>

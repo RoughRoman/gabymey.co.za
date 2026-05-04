@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('architecture', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'architecture'>;
+}
+
+const { entry } = Astro.props;
+const { title, typology, year, heroImage, images, excerpt } = entry.data;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={title} description={excerpt}>
+  <main>
+    <!-- Hero image -->
+    <div class="arch-hero">
+      <img
+        src={heroImage}
+        alt={`Hero image for ${title}`}
+        loading="eager"
+        decoding="async"
+      />
+      <div class="arch-hero-overlay">
+        <span class={`badge badge--${typology}`}>{typology} · {year}</span>
+        <h1>{title}</h1>
+      </div>
+    </div>
+
+    <div class="container arch-project-body">
+      <a href="/architecture" class="back-link" aria-label="Back to architecture projects">← Architecture</a>
+
+      <div class="arch-project-content">
+        <p class="arch-project-excerpt">{excerpt}</p>
+        <div class="post-content">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Image gallery -->
+      {images && images.length > 0 && (
+        <section class="gallery-section" aria-label="Project images">
+          <h2 class="gallery-heading">Project Images</h2>
+          <div class="gallery-grid">
+            {images.map((imgSrc, i) => (
+              <img
+                src={imgSrc}
+                alt={`${title} — image ${i + 1}`}
+                loading="lazy"
+                decoding="async"
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .arch-project-body {
+    padding-top: 1.5rem;
+    max-width: 860px;
+  }
+
+  .arch-project-content {
+    margin-top: 1.5rem;
+  }
+
+  .arch-project-excerpt {
+    font-size: 1.15rem;
+    opacity: 0.75;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  .post-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .post-content p {
+    margin-bottom: 1em;
+  }
+
+  .gallery-section {
+    margin-top: 3rem;
+  }
+
+  .gallery-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+</style>

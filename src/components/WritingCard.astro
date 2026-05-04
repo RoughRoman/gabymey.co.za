@@ -1,0 +1,67 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'writing'>;
+}
+
+const { entry } = Astro.props;
+const { title, category, excerpt, date } = entry.data;
+const rot = (Math.random() * 6 - 3).toFixed(1);
+
+const formattedDate = date.toLocaleDateString('en-ZA', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article class="card writing-card" style={`--rot: ${rot}deg`}>
+  <header>
+    <span class={`badge badge--${category}`}>{category}</span>
+    <h2 class="writing-card-title">
+      <a href={`/writing/${entry.slug}`}>{title}</a>
+    </h2>
+  </header>
+  <p class="writing-card-excerpt">{excerpt}</p>
+  <footer class="writing-card-footer">
+    <time datetime={date.toISOString()}>{formattedDate}</time>
+  </footer>
+</article>
+
+<style>
+  .writing-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .writing-card-title {
+    font-size: 1.4rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0;
+  }
+
+  .writing-card-title a {
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 200ms;
+  }
+
+  .writing-card-title a:hover {
+    color: var(--accent-1);
+  }
+
+  .writing-card-excerpt {
+    font-size: 1rem;
+    opacity: 0.8;
+    flex: 1;
+    margin: 0;
+  }
+
+  .writing-card-footer {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    margin-top: 0.5rem;
+  }
+</style>

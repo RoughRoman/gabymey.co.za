@@ -1,0 +1,58 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Nav from '@/components/Nav.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Gabrielle's personal website — writing, art, and architecture." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} | Gabrielle's Scrapbook</title>
+
+    <!-- Google Fonts: Caveat + Courier Prime + Architects Daughter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Astro View Transitions (ClientRouter enables cross-page transitions) -->
+    <ClientRouter />
+
+    <!--
+      Mode init script — runs synchronously before first paint to prevent
+      flash of un-themed content (FOUC). Reads localStorage and applies
+      the arch-mode class to <html> immediately if needed.
+    -->
+    <script is:inline>
+      (function () {
+        try {
+          var mode = localStorage.getItem('site-mode');
+          if (mode === 'arch') {
+            document.documentElement.classList.add('arch-mode');
+          }
+        } catch (_) {
+          // localStorage unavailable (private browsing, etc.) — default to scrapbook
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <Nav />
+    <slot />
+
+    <!-- Accessible live region for mode announcements -->
+    <div id="mode-announce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  </body>
+</html>

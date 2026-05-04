@@ -1,0 +1,93 @@
+---
+// Lightbox — rendered once per page, activated by JS
+---
+
+<div
+  id="lightbox"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Artwork lightbox"
+  aria-hidden="true"
+>
+  <div class="lightbox-inner" id="lightbox-inner">
+    <button
+      class="lightbox-close"
+      id="lightbox-close"
+      aria-label="Close lightbox"
+    >
+      &times;
+    </button>
+    <img id="lightbox-img" src="" alt="" />
+    <div class="lightbox-caption">
+      <strong id="lightbox-title"></strong>
+      <p id="lightbox-note"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initLightbox() {
+    const overlay = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const titleEl = document.getElementById('lightbox-title');
+    const noteEl = document.getElementById('lightbox-note');
+    const closeBtn = document.getElementById('lightbox-close');
+
+    if (!overlay || !img || !titleEl || !noteEl || !closeBtn) return;
+
+    function openLightbox(src: string, title: string, note: string) {
+      img!.src = src;
+      img!.alt = title;
+      titleEl!.textContent = title;
+      noteEl!.textContent = note;
+      overlay!.classList.add('open');
+      overlay!.setAttribute('aria-hidden', 'false');
+      closeBtn!.focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      overlay!.classList.remove('open');
+      overlay!.setAttribute('aria-hidden', 'true');
+      img!.src = '';
+      document.body.style.overflow = '';
+    }
+
+    // Open on card click
+    document.querySelectorAll('[data-lightbox-src]').forEach((el) => {
+      const handleOpen = () => {
+        const src = el.getAttribute('data-lightbox-src') ?? '';
+        const title = el.getAttribute('data-lightbox-title') ?? '';
+        const note = el.getAttribute('data-lightbox-note') ?? '';
+        openLightbox(src, title, note);
+      };
+
+      el.addEventListener('click', handleOpen);
+      el.addEventListener('keydown', (e: Event) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
+          handleOpen();
+        }
+      });
+    });
+
+    // Close on overlay click (outside inner)
+    overlay.addEventListener('click', (e: MouseEvent) => {
+      if (e.target === overlay) closeLightbox();
+    });
+
+    // Close on close button
+    closeBtn.addEventListener('click', closeLightbox);
+
+    // Close on Escape
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        closeLightbox();
+      }
+    });
+  }
+
+  initLightbox();
+  document.addEventListener('astro:after-swap', initLightbox);
+</script>

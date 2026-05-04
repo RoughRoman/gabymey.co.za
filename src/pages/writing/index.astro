@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import WritingCard from '@/components/WritingCard.astro';
+import { getCollection } from 'astro:content';
+
+const allWriting = await getCollection('writing', ({ data }) => !data.draft);
+const sorted = allWriting.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const categories = ['all', 'poem', 'essay', 'journal', 'other'] as const;
+---
+
+<BaseLayout title="Writing" description="Gabrielle's writing — poems, essays, and journal entries.">
+  <main>
+    <div class="container" style="view-transition-name: page-flip;">
+      <h1 class="page-heading">Writing</h1>
+      <p class="page-subheading">Poems, essays, journal entries, and other things.</p>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs" role="tablist" aria-label="Filter writing by category">
+        {categories.map((cat) => (
+          <button
+            class={cat === 'all' ? 'active' : ''}
+            role="tab"
+            aria-selected={cat === 'all' ? 'true' : 'false'}
+            data-filter={cat}
+          >
+            {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1) + 's'}
+          </button>
+        ))}
+      </div>
+
+      <!-- Writing grid -->
+      <div class="writing-grid" id="writing-grid">
+        {sorted.map((entry) => (
+          <div data-category={entry.data.category} class="writing-card-wrapper">
+            <WritingCard entry={entry} />
+          </div>
+        ))}
+      </div>
+
+      {sorted.length === 0 && (
+        <p class="mt-4" style="opacity: 0.6;">No writing yet — check back soon!</p>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  function initFilters() {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.filter-tabs button[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('#writing-grid .writing-card-wrapper');
+
+    if (!tabs.length) return;
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const filter = tab.getAttribute('data-filter');
+
+        // Update active tab
+        tabs.forEach((t) => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        // Show/hide cards
+        cards.forEach((card) => {
+          const cat = card.getAttribute('data-category');
+          if (filter === 'all' || cat === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+
+  initFilters();
+  document.addEventListener('astro:after-swap', initFilters);
+</script>

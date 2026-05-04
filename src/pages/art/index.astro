@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ArtCard from '@/components/ArtCard.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import { getCollection } from 'astro:content';
+
+const allArt = await getCollection('art', ({ data }) => !data.draft);
+const sorted = allArt.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="Art" description="Gabrielle's artwork — photography, drawings, and mixed media.">
+  <main>
+    <div class="container" style="view-transition-name: page-flip;">
+      <h1 class="page-heading">Art</h1>
+      <p class="page-subheading">Photography, drawings, and experiments.</p>
+
+      {sorted.length > 0 ? (
+        <div class="art-grid">
+          {sorted.map((entry) => (
+            <ArtCard entry={entry} />
+          ))}
+        </div>
+      ) : (
+        <p class="mt-4" style="opacity: 0.6;">No artwork yet — check back soon!</p>
+      )}
+    </div>
+
+    <Lightbox />
+  </main>
+</BaseLayout>

@@ -1,0 +1,71 @@
+{
+  "$ref": "#/definitions/architecture",
+  "definitions": {
+    "architecture": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "integer",
+              "format": "unix-time"
+            }
+          ]
+        },
+        "typology": {
+          "type": "string",
+          "enum": [
+            "residential",
+            "public",
+            "commercial",
+            "concept",
+            "other"
+          ]
+        },
+        "year": {
+          "type": "number"
+        },
+        "heroImage": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "date",
+        "typology",
+        "year",
+        "heroImage",
+        "excerpt"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

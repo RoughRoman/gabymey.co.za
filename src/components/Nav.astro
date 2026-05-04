@@ -1,0 +1,142 @@
+---
+const pathname = Astro.url.pathname;
+---
+
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <!-- Logo -->
+    <a href="/" class="nav-logo scrap-only" aria-label="Gabrielle's Scrapbook — Home">
+      Gabrielle's Scrapbook
+    </a>
+    <a href="/" class="nav-logo arch-only" aria-label="G. Architecture — Home">
+      G. Architecture
+    </a>
+
+    <!-- Hamburger button (mobile) -->
+    <button
+      class="nav-hamburger"
+      id="nav-hamburger"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+      aria-label="Open navigation menu"
+    >
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="3" y="6" width="20" height="2" rx="1" fill="currentColor" />
+        <rect x="3" y="12" width="20" height="2" rx="1" fill="currentColor" />
+        <rect x="3" y="18" width="20" height="2" rx="1" fill="currentColor" />
+      </svg>
+    </button>
+
+    <!-- Nav menu (hidden on mobile until hamburger clicked) -->
+    <div class="nav-menu" id="nav-menu" role="list">
+      <ul class="nav-links" role="list">
+        <!-- Scrapbook-mode links -->
+        <li class="scrap-only"><a href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</a></li>
+        <li class="scrap-only"><a href="/writing" aria-current={pathname.startsWith('/writing') ? 'page' : undefined}>Writing</a></li>
+        <li class="scrap-only"><a href="/art" aria-current={pathname.startsWith('/art') ? 'page' : undefined}>Art</a></li>
+        <li class="scrap-only"><a href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>About</a></li>
+
+        <!-- Architecture-mode links -->
+        <li class="arch-only"><a href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</a></li>
+        <li class="arch-only"><a href="/architecture" aria-current={pathname.startsWith('/architecture') ? 'page' : undefined}>Architecture</a></li>
+        <li class="arch-only"><a href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>About</a></li>
+      </ul>
+    </div>
+
+    <!-- Mode toggle button -->
+    <div class="nav-right">
+      <button
+        class="mode-toggle"
+        id="mode-toggle"
+        data-mode-toggle
+        aria-label="Switch to Architecture mode"
+      >
+        <!-- Scrapbook mode: show pencil icon + "Architecture" label -->
+        <span class="scrap-only" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M9.5 3.5l3 3" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <span class="scrap-only">Architecture</span>
+
+        <!-- Architecture mode: show ruler/blueprint icon + "Scrapbook" label -->
+        <span class="arch-only" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="1" y="6" width="14" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="4" y1="6" x2="4" y2="9" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="7" y1="6" x2="7" y2="8" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="10" y1="6" x2="10" y2="9" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="13" y1="6" x2="13" y2="8" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </span>
+        <span class="arch-only">Scrapbook</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function initNav() {
+    const html = document.documentElement;
+    const toggleBtn = document.getElementById('mode-toggle');
+    const hamburger = document.getElementById('nav-hamburger');
+    const menu = document.getElementById('nav-menu');
+    const announcer = document.getElementById('mode-announce');
+
+    // ── Mode toggle ────────────────────────────────────────────
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const isArch = html.classList.toggle('arch-mode');
+        try {
+          localStorage.setItem('site-mode', isArch ? 'arch' : 'scrap');
+        } catch (_) {}
+
+        // Update aria-label
+        toggleBtn.setAttribute(
+          'aria-label',
+          isArch ? 'Switch to Scrapbook mode' : 'Switch to Architecture mode'
+        );
+
+        // Announce to screen readers
+        if (announcer) {
+          announcer.textContent = isArch
+            ? 'Architecture mode activated'
+            : 'Scrapbook mode activated';
+        }
+      });
+
+      // Set correct aria-label on initial load
+      const isArch = html.classList.contains('arch-mode');
+      toggleBtn.setAttribute(
+        'aria-label',
+        isArch ? 'Switch to Scrapbook mode' : 'Switch to Architecture mode'
+      );
+    }
+
+    // ── Hamburger (mobile) ─────────────────────────────────────
+    if (hamburger && menu) {
+      hamburger.addEventListener('click', () => {
+        const isOpen = menu.classList.toggle('open');
+        hamburger.setAttribute('aria-expanded', String(isOpen));
+        hamburger.setAttribute(
+          'aria-label',
+          isOpen ? 'Close navigation menu' : 'Open navigation menu'
+        );
+      });
+
+      // Close menu when a link inside is clicked
+      menu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          menu.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+          hamburger.setAttribute('aria-label', 'Open navigation menu');
+        });
+      });
+    }
+  }
+
+  // Run on initial load and after each View Transition navigation
+  initNav();
+  document.addEventListener('astro:after-swap', initNav);
+</script>

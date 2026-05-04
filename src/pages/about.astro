@@ -1,0 +1,141 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="About Gabrielle — writer, artist, and architecture student.">
+  <main>
+    <div class="container about-page">
+
+      <!-- Scrapbook doodle heading -->
+      <div class="about-heading-wrap scrap-only">
+        <!-- Hand-drawn asterisk decoration -->
+        <svg class="about-doodle about-doodle-star" width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <line x1="24" y1="4" x2="24" y2="44" stroke="var(--accent-1)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="4" y1="24" x2="44" y2="24" stroke="var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="8" y1="8" x2="40" y2="40" stroke="var(--accent-3)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="40" y1="8" x2="8" y2="40" stroke="var(--accent-1)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <h1 class="page-heading">Hello there!</h1>
+      </div>
+
+      <h1 class="page-heading arch-only">About</h1>
+
+      <div class="about-layout">
+        <!-- Photo column -->
+        <div>
+          <img
+            src="/images/placeholder.jpg"
+            alt="A photo of Gabrielle"
+            class="about-photo torn-img scrap-only"
+            loading="eager"
+            decoding="async"
+          />
+          <img
+            src="/images/placeholder.jpg"
+            alt="A photo of Gabrielle"
+            class="about-photo arch-only"
+            loading="eager"
+            decoding="async"
+            style="border-radius: 2px; border: 1.5px solid var(--border);"
+          />
+        </div>
+
+        <!-- Bio column -->
+        <div class="about-text">
+          <p>
+            Hi! I'm Gabrielle — a writer, artist, and architecture student based in South Africa.
+            This site is my personal scrapbook: a place to share poems, essays, sketches, photographs,
+            and the architecture projects I'm most proud of.
+          </p>
+          <p>
+            I built this site so I'd always have somewhere to put everything — the written
+            and the drawn and the built. Pull up a chair. Stay a while.
+          </p>
+          <p>
+            When I'm not writing or drawing, you'll find me in studio with trace paper and
+            too many coffee cups, or out looking for interesting buildings to photograph.
+          </p>
+
+          <!-- Scrapbook-mode decorative quote -->
+          <blockquote class="about-quote scrap-only">
+            "To design is to communicate clearly." — Milton Glaser
+          </blockquote>
+
+          <!-- Architecture-mode decorative quote -->
+          <blockquote class="about-quote arch-only">
+            "Architecture is the thoughtful making of space." — Louis Kahn
+          </blockquote>
+
+          <div class="about-links">
+            <a href="/writing">Read my writing →</a>
+            <a href="/art">See my art →</a>
+            <a href="/architecture">View my projects →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrapbook doodle footer decoration -->
+      <div class="about-footer-doodle scrap-only" aria-hidden="true">
+        <svg width="200" height="40" viewBox="0 0 200 40" fill="none">
+          <path d="M10 20 Q50 5, 100 20 Q150 35, 190 20" stroke="var(--border)" stroke-width="2" stroke-dasharray="6 3" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .about-page {
+    padding-bottom: 4rem;
+  }
+
+  .about-heading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .about-doodle {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .about-text p {
+    font-size: 1.1rem;
+    margin-bottom: 1.1em;
+  }
+
+  .about-quote {
+    border-left: 3px solid var(--accent-1);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    opacity: 0.8;
+    font-size: 1.05rem;
+  }
+
+  .about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-links a {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-3);
+  }
+
+  .about-links a:hover {
+    color: var(--accent-1);
+  }
+
+  .about-footer-doodle {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    opacity: 0.5;
+  }
+</style>

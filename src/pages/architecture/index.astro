@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ArchCard from '@/components/ArchCard.astro';
+import { getCollection } from 'astro:content';
+
+const allArch = await getCollection('architecture', ({ data }) => !data.draft);
+const sorted = allArch.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="Architecture" description="Gabrielle's architecture projects.">
+  <main>
+    <!-- Scrapbook mode: mode-gate message -->
+    <div class="container scrap-only">
+      <div class="mode-gate">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true" style="margin: 0 auto 1rem;">
+          <rect x="8" y="28" width="48" height="28" rx="3" stroke="var(--border)" stroke-width="2.5"/>
+          <path d="M16 28V20a16 16 0 0 1 32 0v8" stroke="var(--border)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="32" cy="43" r="4" fill="var(--border)"/>
+        </svg>
+        <p>Switch to Architecture mode to view her projects.</p>
+        <button
+          class="mode-gate-btn"
+          data-mode-toggle
+          aria-label="Switch to Architecture mode"
+        >
+          Switch to Architecture mode
+        </button>
+      </div>
+    </div>
+
+    <!-- Architecture mode: project grid -->
+    <div class="container arch-only">
+      <h1 class="page-heading">Architecture</h1>
+      <p class="page-subheading">Projects, concepts, and studies.</p>
+
+      {sorted.length > 0 ? (
+        <div class="arch-grid">
+          {sorted.map((entry) => (
+            <ArchCard entry={entry} />
+          ))}
+        </div>
+      ) : (
+        <p class="mt-4" style="opacity: 0.6;">No projects yet — check back soon!</p>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .mode-gate-btn {
+    background: var(--accent-1);
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 0.6em 1.4em;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 200ms;
+  }
+
+  .mode-gate-btn:hover {
+    background: var(--accent-3);
+  }
+</style>
+
+<script>
+  function initGateBtn() {
+    const btn = document.querySelector<HTMLButtonElement>('.mode-gate-btn[data-mode-toggle]');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      document.documentElement.classList.add('arch-mode');
+      try { localStorage.setItem('site-mode', 'arch'); } catch (_) {}
+
+      const announcer = document.getElementById('mode-announce');
+      if (announcer) announcer.textContent = 'Architecture mode activated';
+
+      // Update the nav toggle button aria-label too
+      const navToggle = document.getElementById('mode-toggle');
+      if (navToggle) navToggle.setAttribute('aria-label', 'Switch to Scrapbook mode');
+    });
+  }
+
+  initGateBtn();
+  document.addEventListener('astro:after-swap', initGateBtn);
+</script>
