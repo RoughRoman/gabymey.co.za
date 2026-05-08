@@ -29,12 +29,9 @@ resource "aws_s3_bucket_versioning" "site" {
   }
 }
 
-# Bucket policy:
-#   1. Allow CloudFront OAC to read objects (s3:GetObject)
-#   2. Allow the Github-Actions IAM user to sync files (put / delete / list)
-#
-# IMPORTANT: Replace ACCOUNT_ID below with your actual 12-digit AWS account ID
-#            before running terraform apply.
+# Bucket policy: allow CloudFront OAC to read objects (s3:GetObject).
+# GitHub Actions S3 access is handled via the IAM identity policy in iam.tf —
+# a bucket policy statement is not needed for same-account IAM principals.
 resource "aws_s3_bucket_policy" "site" {
   bucket = aws_s3_bucket.site.id
 
@@ -42,7 +39,6 @@ resource "aws_s3_bucket_policy" "site" {
     Version = "2012-10-17"
     Statement = [
       {
-        # Allow CloudFront (via OAC) to read any object in the bucket
         Sid    = "AllowCloudFrontOAC"
         Effect = "Allow"
         Principal = {
@@ -55,24 +51,6 @@ resource "aws_s3_bucket_policy" "site" {
             "AWS:SourceArn" = aws_cloudfront_distribution.site.arn
           }
         }
-      },
-      {
-        # Allow Github-Actions IAM user to deploy the site
-        # Replace ACCOUNT_ID with your 12-digit AWS account ID
-        Sid    = "AllowGithubActionsSync"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::ACCOUNT_ID:user/Github-Actions"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          aws_s3_bucket.site.arn,
-          "${aws_s3_bucket.site.arn}/*"
-        ]
       }
     ]
   })
