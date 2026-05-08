@@ -14,7 +14,7 @@ resource "aws_cloudfront_origin_access_control" "site" {
 # CloudFront Function — rewrites extensionless URI paths to /path/index.html
 # so that Astro's static output works correctly (e.g. /writing → /writing/index.html)
 resource "aws_cloudfront_function" "uri_rewrite" {
-  name    = "${var.site_name}-uri-rewrite"
+  name    = "gabymey-co-za-uri-rewrite"
   runtime = "cloudfront-js-2.0"
   publish = true
 
