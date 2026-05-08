@@ -6,7 +6,7 @@
 # It does NOT create the user — only attaches a policy to it.
 
 data "aws_iam_user" "github_actions" {
-  user_name = "Github-Actions"
+  user_name = "Github-Actions-TF"
 }
 
 resource "aws_iam_policy" "github_actions_deploy" {
