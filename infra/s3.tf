@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 
 resource "aws_s3_bucket" "site" {
-  bucket = "${var.site_name}-site"
+  bucket = "${var.site_name}"
 
   tags = {
     Project = var.site_name

@@ -1,7 +1,7 @@
 variable "site_name" {
   description = "Base name used for resources (e.g. S3 bucket will be named <site_name>-site)"
   type        = string
-  default     = "gabrielle-scrapbook"
+  default     = "gabymey.co.za"
 }
 
 variable "aws_region" {
